@@ -1,0 +1,117 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetScan – Java Port Scanner</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2322d3a6'/><circle cx='16' cy='16' r='6' fill='%230b1220'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>NetScan</h1>
+        <p>Java TCP port scanner</p>
+      </div>
+    </div>
+    <span id="modeBadge" class="badge" hidden>Public mode</span>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="scanTitle">
+      <h2 id="scanTitle">New scan</h2>
+      <form id="scanForm" novalidate>
+        <div class="field">
+          <label for="host">Target host or IP</label>
+          <div class="row">
+            <input id="host" name="host" placeholder="127.0.0.1 or example.com" autocomplete="off" required>
+            <button type="button" class="ghost" id="myIpBtn">Use my IP</button>
+            <button type="button" class="ghost" id="localBtn">localhost</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Ports</span>
+          <div class="presets" role="radiogroup" aria-label="Port preset">
+            <label><input type="radio" name="preset" value="common" checked> Common (23)</label>
+            <label><input type="radio" name="preset" value="1-1024"> Well-known (1–1024)</label>
+            <label><input type="radio" name="preset" value="custom"> Custom</label>
+          </div>
+          <input id="ports" name="ports" placeholder="e.g. 22,80,443,8000-8100" hidden>
+        </div>
+
+        <div class="field">
+          <label for="timeout">Timeout per port: <strong id="timeoutVal">500</strong> ms</label>
+          <input id="timeout" name="timeout" type="range" min="100" max="3000" step="100" value="500">
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="authorized">
+          <span>I own this system or have explicit permission to scan it.</span>
+        </label>
+
+        <button type="submit" id="scanBtn" class="primary">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="btn-text">Start scan</span>
+        </button>
+        <p id="error" class="error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section id="resultsCard" class="card" hidden aria-labelledby="resultsTitle">
+      <div class="results-head">
+        <div>
+          <h2 id="resultsTitle">Results</h2>
+          <p id="meta" class="muted"></p>
+        </div>
+        <a id="csvBtn" class="ghost button" href="#" download>Export CSV</a>
+      </div>
+
+      <div class="stats">
+        <button class="stat open" data-filter="OPEN"><span id="nOpen">0</span>Open</button>
+        <button class="stat closed" data-filter="CLOSED"><span id="nClosed">0</span>Closed</button>
+        <button class="stat filtered" data-filter="FILTERED"><span id="nFiltered">0</span>No response</button>
+        <button class="stat all active" data-filter="ALL"><span id="nTotal">0</span>Total</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Port</th><th>Status</th><th>Likely service</th><th>Response</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p id="emptyRow" class="muted center" hidden>No ports match this filter.</p>
+    </section>
+
+    <section class="card learn" aria-labelledby="learnTitle">
+      <h2 id="learnTitle">Understanding the results</h2>
+      <div class="grid3">
+        <div>
+          <h3><span class="dot open"></span>Open</h3>
+          <p>The TCP handshake completed (SYN → SYN/ACK → ACK). A program is listening and accepting connections on this port.</p>
+        </div>
+        <div>
+          <h3><span class="dot closed"></span>Closed</h3>
+          <p>The host replied with a reset (RST). It is reachable, but nothing is listening on this port.</p>
+        </div>
+        <div>
+          <h3><span class="dot filtered"></span>No response</h3>
+          <p>Nothing came back before the timeout. Usually a firewall is silently dropping packets, or the host is offline.</p>
+        </div>
+      </div>
+      <h3>Why port management matters</h3>
+      <p>Every open port is a door into a system. Services you don't need — an old database, remote desktop, a forgotten dev server — should be stopped or firewalled. Scan your own machines regularly and close what you don't recognise.</p>
+      <p class="muted small">Only scan systems you own or are authorised to test. <code>scanme.nmap.org</code> is a host whose owners explicitly allow light test scans.</p>
+    </section>
+  </main>
+
+  <footer>NetScan · built with Java <code>java.net.Socket</code> and <code>com.sun.net.httpserver</code></footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
